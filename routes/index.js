@@ -1,9 +1,10 @@
 import express from "express";
-import { questionStore } from "../data/questionStore";
+import { questionStore } from "../data/questionStore.js";
+import { generateQuestionPaper } from "../utils/questionPaperGenerator.js";
 
-const Router = express.Router();
+const paperRouter = express.Router();
 
-Router.post("/generate-paper", (req, res, next) => {
+paperRouter.post("/generate-paper", (req, res, next) => {
 	const { marks, easy, medium, hard } = req.body;
 
 	if (easy + medium + hard !== marks) {
@@ -27,4 +28,4 @@ Router.post("/generate-paper", (req, res, next) => {
 	res.status(200).json({ questionPaper });
 });
 
-export default Router;
+export default paperRouter;
