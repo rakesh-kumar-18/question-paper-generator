@@ -1,20 +1,20 @@
 import express from "express";
 import { questionStore } from "../data/questionStore.js";
 import { generateQuestionPaper } from "../utils/questionPaperGenerator.js";
-import { validateInput } from "../middlewares/inputValidation.js";
+import { validateInputValues } from "../middlewares/inputValidation.js";
 
 const paperRouter = express.Router();
 
-paperRouter.post("/generate-paper", validateInput, (req, res, next) => {
+// Endpoint for generating a question paper
+paperRouter.post("/generate-paper", (req, res) => {
 	const { marks, easy, medium, hard } = req.body;
 
-	try {
-		if (easy + medium + hard !== marks) {
-			return res
-				.status(400)
-				.json({ error: "The sum of percentages must be equal to total marks" });
-		}
+	const validationError = validateInputValues(marks, easy, medium, hard);
+	if (validationError) {
+		return res.status(400).json({ error: validationError });
+	}
 
+	try {
 		const difficultyDistribution = [
 			{ difficulty: "Easy", percentage: easy },
 			{ difficulty: "Medium", percentage: medium },
@@ -29,7 +29,7 @@ paperRouter.post("/generate-paper", validateInput, (req, res, next) => {
 
 		res.status(200).json({ questionPaper });
 	} catch (error) {
-		next(error);
+		res.status(500).json({ error: "Internal Server Error" });
 	}
 });
 
